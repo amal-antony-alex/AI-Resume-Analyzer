@@ -16,12 +16,12 @@ def parse_resume(file_path):
     lines = [line.strip() for line in text.split("\n") if line.strip()]
     name = lines[0] if lines else "Not Found"
 
-    # Basic skill extraction (extendable)
+    # Basic skill extraction
     skill_keywords = [
-        "python", "java", "machine learning", "data science",
+        "python", "java", "machine learning", "data science"
         "deep learning", "sql", "javascript", "html", "css",
         "react", "django", "flask", "tensorflow", "pandas",
-        "numpy", "opencv", "aws", "git"
+        "numpy", "aws", "git"
     ]
 
     skills = sorted({

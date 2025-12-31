@@ -7,10 +7,7 @@ import pandas as pd
 import plotly.express as px
 from pdfminer.high_level import extract_text
 from resume_parser import parse_resume
-from pdfminer3.layout import LAParams
-from pdfminer3.pdfpage import PDFPage
-from pdfminer3.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer3.converter import TextConverter
+
 
 from Courses import (
     ds_course, web_course, android_course,
@@ -37,19 +34,7 @@ exp_vectorizer = joblib.load("models/experience_vectorizer.pkl")
 
 # ================== PDF TEXT READER ==================
 def pdf_reader(file_path):
-    resource_manager = PDFResourceManager()
-    fake_file_handle = io.StringIO()
-    converter = TextConverter(resource_manager, fake_file_handle, laparams=LAParams())
-    interpreter = PDFPageInterpreter(resource_manager, converter)
-
-    with open(file_path, 'rb') as fh:
-        for page in PDFPage.get_pages(fh):
-            interpreter.process_page(page)
-
-    text = fake_file_handle.getvalue()
-    converter.close()
-    fake_file_handle.close()
-    return text
+    return extract_text(file_path)
 
 # ================== ML PREDICTIONS ==================
 def predict_with_ml(resume_text):
