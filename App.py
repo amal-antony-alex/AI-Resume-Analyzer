@@ -5,7 +5,6 @@ import nltk
 import joblib
 import pandas as pd
 import plotly.express as px
-
 from pdfminer.high_level import extract_text
 from resume_parser import parse_resume
 
