@@ -1,47 +1,37 @@
+# resume_parser.py
 import re
-import spacy
-from pathlib import Path
 from pdfminer.high_level import extract_text
 
-nlp = spacy.load("en_core_web_sm")
+def parse_resume(file_path):
+    text = extract_text(file_path)
 
-SKILLS_DB = [
-    "python", "java", "c++", "machine learning", "deep learning",
-    "nlp", "data science", "tensorflow", "pytorch",
-    "sql", "mysql", "mongodb", "html", "css", "javascript",
-    "react", "django", "flask", "streamlit", "git", "docker"
-]
+    # Extract email
+    email_match = re.search(
+        r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
+        text
+    )
+    email = email_match.group(0) if email_match else "Not Found"
 
-def extract_email(text):
-    match = re.search(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", text)
-    return match.group(0) if match else None
+    # Extract name (first non-empty line)
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
+    name = lines[0] if lines else "Not Found"
 
-def extract_phone(text):
-    match = re.search(r"\b\d{10}\b", text)
-    return match.group(0) if match else None
+    # Basic skill extraction (extendable)
+    skill_keywords = [
+        "python", "java", "machine learning", "data science",
+        "deep learning", "sql", "javascript", "html", "css",
+        "react", "django", "flask", "tensorflow", "pandas",
+        "numpy", "opencv", "aws", "git"
+    ]
 
-def extract_skills(text):
-    text = text.lower()
-    return list(set(skill for skill in SKILLS_DB if skill in text))
-
-def parse_resume(pdf_path):
-    if not Path(pdf_path).exists():
-        return None
-
-    text = extract_text(pdf_path)
-    doc = nlp(text)
-
-    name = None
-    for ent in doc.ents:
-        if ent.label_ == "PERSON":
-            name = ent.text
-            break
+    skills = sorted({
+        skill.title()
+        for skill in skill_keywords
+        if skill in text.lower()
+    })
 
     return {
         "name": name,
-        "email": extract_email(text),
-        "mobile_number": extract_phone(text),
-        "skills": extract_skills(text),
-        "degree": None,
-        "no_of_pages": text.count("\f") + 1
+        "email": email,
+        "skills": skills
     }
